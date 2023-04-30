@@ -15,6 +15,10 @@ const GeneratePage: NextPage = () => {
   const generateIcon = api.generate.generateIcon.useMutation({
     onSuccess(data) {
       console.log("mutation finished", data.message);
+      setForm({
+        ...form,
+        prompt: "",
+      });
     },
   });
 
