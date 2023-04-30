@@ -20,7 +20,10 @@ const config = {
   },
 
   images: {
-    domains: ["oaidalleapiprodscus.blob.core.windows.net"],
+    domains: [
+      "oaidalleapiprodscus.blob.core.windows.net",
+      "icon-generator-bucket.s3.amazonaws.com",
+    ],
   },
 };
 export default config;

@@ -10,6 +10,8 @@ const s3 = new AWS.S3({
   region: "us-east-1",
 });
 
+const BUCKET_NAME = "icon-generator-bucket";
+
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 import { Configuration, OpenAIApi } from "openai";
@@ -86,7 +88,7 @@ export const generateRouter = createTRPCRouter({
         .promise();
 
       return {
-        imageUrl: base64EncodedImage,
+        imageUrl: `https://${BUCKET_NAME}.s3.amazonaws.com/${icon.id}`,
       };
     }),
 });
