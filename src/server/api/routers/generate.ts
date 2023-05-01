@@ -42,6 +42,7 @@ export const generateRouter = createTRPCRouter({
     .input(
       z.object({
         prompt: z.string(),
+        color: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -67,6 +68,8 @@ export const generateRouter = createTRPCRouter({
           message: "You do not have enough credits",
         });
       }
+
+      const finalPrompt = `a modern icon in ${input.color} of ${input.prompt}, 3d rendered, metallic material, shiny, minimalistic`;
 
       const base64EncodedImage = await generateIcon(input.prompt);
 
