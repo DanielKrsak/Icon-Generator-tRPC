@@ -1,4 +1,3 @@
-import Link from "next/link";
 import PrimaryLink from "./PrimaryLink";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Button from "./Button";

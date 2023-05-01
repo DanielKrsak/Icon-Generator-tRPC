@@ -71,7 +71,7 @@ export const generateRouter = createTRPCRouter({
 
       const finalPrompt = `a modern icon in ${input.color} of ${input.prompt}, 3d rendered, metallic material, shiny, minimalistic`;
 
-      const base64EncodedImage = await generateIcon(input.prompt);
+      const base64EncodedImage = await generateIcon(finalPrompt);
 
       const icon = await ctx.prisma.icon.create({
         data: {
