@@ -18,29 +18,31 @@ const colors = [
   "black",
 ];
 
+const shapes = ["square", "circle", "rounded"];
+
 const GeneratePage: NextPage = () => {
   const [form, setForm] = useState({
     prompt: "",
     color: "",
+    shape: "",
+    numberOfIcons: "1",
   });
 
-  const [imageUrl, setImageUrl] = useState("");
+  const [imagesUrl, setImagesUrl] = useState<{ imageUrl: string }[]>([]);
 
   const generateIcon = api.generate.generateIcon.useMutation({
     onSuccess(data) {
-      if (!data.imageUrl) return;
-      setImageUrl(data.imageUrl);
-      setForm((prev) => ({
-        ...prev,
-        prompt: "",
-      }));
+      setImagesUrl(data);
     },
   });
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    generateIcon.mutate(form);
+    generateIcon.mutate({
+      ...form,
+      numberOfIcons: parseInt(form.numberOfIcons),
+    });
   };
 
   const updateForm = (key: string) => {
@@ -70,7 +72,11 @@ const GeneratePage: NextPage = () => {
           </h2>
           <FormGroup className="mb-12">
             <label htmlFor="">Prompt</label>
-            <Input value={form.prompt} onChange={updateForm("prompt")} />
+            <Input
+              value={form.prompt}
+              required
+              onChange={updateForm("prompt")}
+            />
           </FormGroup>
           <h2 className="text-xl">2. Pick your icon color</h2>
           <FormGroup className="mb-12 grid grid-cols-4">
@@ -81,6 +87,7 @@ const GeneratePage: NextPage = () => {
                     type="radio"
                     name="color"
                     value={color}
+                    required
                     checked={color === form.color}
                     onChange={() =>
                       setForm((prev) => {
@@ -93,6 +100,42 @@ const GeneratePage: NextPage = () => {
               );
             })}
           </FormGroup>
+          <h2 className="text-xl">3. Pick your icon shape</h2>
+          <FormGroup className="mb-12 grid grid-cols-4">
+            {shapes.map((shape) => {
+              return (
+                <label key={shape} className="flex gap-2 text-lg lowercase">
+                  <input
+                    type="radio"
+                    name="shape"
+                    value={shape}
+                    required
+                    checked={shape === form.shape}
+                    onChange={() =>
+                      setForm((prev) => {
+                        return { ...prev, shape };
+                      })
+                    }
+                  />
+                  {shape}
+                </label>
+              );
+            })}
+          </FormGroup>
+
+          <h2 className="text-xl">4. How many do you want?</h2>
+          <FormGroup className="mb-12">
+            <label>Number of icons</label>
+            <Input
+              name="color"
+              inputMode="numeric"
+              pattern="[1-9]|10"
+              required
+              value={form.numberOfIcons}
+              onChange={updateForm("numberOfIcons")}
+            />
+          </FormGroup>
+
           <Button
             isLoading={generateIcon.isLoading}
             disabled={generateIcon.isLoading}
@@ -100,18 +143,22 @@ const GeneratePage: NextPage = () => {
             Submit
           </Button>
         </form>
-        {imageUrl && (
+        {imagesUrl.length > 0 && (
           <>
             <h2 className="text-1xl">Your Icons</h2>
             <section className="mb-12 grid grid-cols-4 gap-4">
-              <Image
-                // src={`data:image/png;base64,${imageUrl}`}
-                src={imageUrl}
-                alt="api-image"
-                height="100"
-                width="100"
-                className="w-full"
-              />
+              {imagesUrl.map(({ imageUrl }) => {
+                return (
+                  <Image
+                    key={imageUrl}
+                    src={imageUrl}
+                    alt="api-image"
+                    height="512"
+                    width="512"
+                    className="w-full"
+                  />
+                );
+              })}
             </section>
           </>
         )}

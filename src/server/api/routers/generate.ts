@@ -22,18 +22,17 @@ const configuration = new Configuration({
 });
 const openai = new OpenAIApi(configuration);
 
-const generateIcon = async (prompt: string): Promise<string | undefined> => {
+const generateIcon = async (prompt: string, numberOfIcons = 1) => {
   if (env.MOCK_DALLE === "true") {
-    return b64Image;
+    return new Array<string>(numberOfIcons).fill(b64Image);
   } else {
     const response = await openai.createImage({
       prompt,
-      n: 1,
+      n: numberOfIcons,
       size: "512x512",
       response_format: "b64_json",
     });
-    console.log(response.data.data[0]?.b64_json);
-    return response.data.data[0]?.b64_json;
+    return response.data.data.map((result) => result.b64_json || "");
   }
 };
 
@@ -43,6 +42,8 @@ export const generateRouter = createTRPCRouter({
       z.object({
         prompt: z.string(),
         color: z.string(),
+        shape: z.string(),
+        numberOfIcons: z.number().min(1).max(10),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -69,29 +70,38 @@ export const generateRouter = createTRPCRouter({
         });
       }
 
-      const finalPrompt = `a modern icon in ${input.color} of ${input.prompt}, 3d rendered, metallic material, shiny, minimalistic`;
+      const finalPrompt = `a modern icon ${input.shape} in ${input.color} of ${input.prompt}, 3d rendered, metallic material, shiny, minimalistic, high quiality, trending on art station, unreal engine graphics quality`;
 
-      const base64EncodedImage = await generateIcon(finalPrompt);
+      const base64EncodedImages = await generateIcon(
+        finalPrompt,
+        input.numberOfIcons
+      );
 
-      const icon = await ctx.prisma.icon.create({
-        data: {
-          prompt: input.prompt,
-          userId: ctx.session.user.id,
-        },
-      });
-
-      await s3
-        .putObject({
-          Bucket: "icon-generator-bucket",
-          Body: Buffer.from(base64EncodedImage!, "base64"),
-          Key: icon.id,
-          ContentEncoding: "base64",
-          ContentType: "image/gif",
+      const createdIcons = await Promise.all(
+        base64EncodedImages.map(async (image) => {
+          const icon = await ctx.prisma.icon.create({
+            data: {
+              prompt: input.prompt,
+              userId: ctx.session.user.id,
+            },
+          });
+          await s3
+            .putObject({
+              Bucket: "icon-generator-bucket",
+              Body: Buffer.from(image!, "base64"),
+              Key: icon.id,
+              ContentEncoding: "base64",
+              ContentType: "image/gif",
+            })
+            .promise();
+          return icon;
         })
-        .promise();
+      );
 
-      return {
-        imageUrl: `https://${BUCKET_NAME}.s3.amazonaws.com/${icon.id}`,
-      };
+      return createdIcons.map((icon) => {
+        return {
+          imageUrl: `https://${BUCKET_NAME}.s3.amazonaws.com/${icon.id}`,
+        };
+      });
     }),
 });
