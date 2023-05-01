@@ -8,7 +8,7 @@ const HeroBanner = () => {
     <section className="mb-24 mt-12 grid grid-cols-1 gap-12 px-4 sm:mt-24 sm:grid-cols-2">
       <div className="flex flex-col gap-4">
         <h1 className="text-6xl">Generate icons with a click of a button</h1>
-        <p className="text-1xl">
+        <p className="text-1xl mb-6">
           Use AI to generate icons in seconds instead of paying designer and
           waiting for them to create them for you
         </p>

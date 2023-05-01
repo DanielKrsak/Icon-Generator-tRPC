@@ -16,6 +16,11 @@ const Header = () => {
         <li>
           <PrimaryLink href={"/generate"}>Generate</PrimaryLink>
         </li>
+        {isLoggedIn && (
+          <li>
+            <PrimaryLink href={"/collection"}>Collection</PrimaryLink>
+          </li>
+        )}
       </ul>
       <ul className="flex gap-4">
         {isLoggedIn && (
