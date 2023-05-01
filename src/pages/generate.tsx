@@ -2,6 +2,7 @@ import { type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import React, { useState } from "react";
+import { setErrorMap } from "zod";
 import Button from "~/components/Button";
 import FormGroup from "~/components/FormGroup";
 import Input from "~/components/Input";
@@ -20,13 +21,23 @@ const colors = [
 
 const shapes = ["square", "circle", "rounded"];
 
+const styles = [
+  "claymorphic",
+  "3d rendered",
+  "pixelated",
+  "illustrated with color pencil",
+];
+
 const GeneratePage: NextPage = () => {
   const [form, setForm] = useState({
     prompt: "",
     color: "",
     shape: "",
+    style: "",
     numberOfIcons: "1",
   });
+
+  const [error, setError] = useState("");
 
   const [imagesUrl, setImagesUrl] = useState<{ imageUrl: string }[]>([]);
 
@@ -34,10 +45,14 @@ const GeneratePage: NextPage = () => {
     onSuccess(data) {
       setImagesUrl(data);
     },
+    onError(error) {
+      setError(error.message);
+    },
   });
 
   const handleFormSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
 
     generateIcon.mutate({
       ...form,
@@ -122,8 +137,33 @@ const GeneratePage: NextPage = () => {
               );
             })}
           </FormGroup>
+          <h2 className="text-xl">4. Pick your icon style</h2>
+          <FormGroup className="mb-12 grid grid-cols-4">
+            {styles.map((style) => {
+              return (
+                <label
+                  key={style}
+                  className="flex items-center gap-2 text-lg lowercase"
+                >
+                  <input
+                    type="radio"
+                    name="style"
+                    value={style}
+                    required
+                    checked={style === form.style}
+                    onChange={() =>
+                      setForm((prev) => {
+                        return { ...prev, style };
+                      })
+                    }
+                  />
+                  {style}
+                </label>
+              );
+            })}
+          </FormGroup>
 
-          <h2 className="text-xl">4. How many do you want?</h2>
+          <h2 className="text-xl">5. How many do you want?</h2>
           <FormGroup className="mb-12">
             <label>Number of icons</label>
             <Input
@@ -135,6 +175,12 @@ const GeneratePage: NextPage = () => {
               onChange={updateForm("numberOfIcons")}
             />
           </FormGroup>
+
+          {error && (
+            <div className="rounded bg-red-500 p-8 text-lg text-white">
+              {error}
+            </div>
+          )}
 
           <Button
             isLoading={generateIcon.isLoading}
