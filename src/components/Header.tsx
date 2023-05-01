@@ -21,17 +21,10 @@ const Header = () => {
         {isLoggedIn && (
           <>
             <li>
-              <Button
-                onClick={async () => await buyCredits().catch(console.error)}
-              >
-                Buy Credits
-              </Button>
+              <Button onClick={() => buyCredits()}>Buy Credits</Button>
             </li>
             <li>
-              <Button
-                variant="secondary"
-                onClick={async () => await signOut().catch(console.error)}
-              >
+              <Button variant="secondary" onClick={() => signOut()}>
                 Logout
               </Button>
             </li>
@@ -39,9 +32,7 @@ const Header = () => {
         )}
         {!isLoggedIn && (
           <li>
-            <Button onClick={async () => await signIn().catch(console.error)}>
-              Login
-            </Button>
+            <Button onClick={() => signIn()}>Login</Button>
           </li>
         )}
       </ul>
