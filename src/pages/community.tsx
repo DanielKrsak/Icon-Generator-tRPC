@@ -1,4 +1,4 @@
-import { Icon } from "@prisma/client";
+import type { Icon } from "@prisma/client";
 import { type NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
@@ -25,7 +25,7 @@ const CommunityPage: NextPage = () => {
                   <Image
                     width={100}
                     height={100}
-                    alt={`${icon.prompt}` ?? "Image of an icon"}
+                    alt={icon.prompt ?? "Image of an icon"}
                     src={`https://icon-generator-bucket.s3.amazonaws.com/${icon.id}`}
                     className="w-full"
                   />

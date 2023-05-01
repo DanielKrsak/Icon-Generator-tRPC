@@ -89,7 +89,7 @@ export const generateRouter = createTRPCRouter({
           await s3
             .putObject({
               Bucket: "icon-generator-bucket",
-              Body: Buffer.from(image!, "base64"),
+              Body: Buffer.from(image, "base64"),
               Key: icon.id,
               ContentEncoding: "base64",
               ContentType: "image/gif",
