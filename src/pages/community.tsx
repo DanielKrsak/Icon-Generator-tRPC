@@ -17,8 +17,8 @@ const CommunityPage: NextPage = () => {
       </Head>
       <main className="container mx-auto mt-24 flex min-h-screen flex-col gap-6 px-12">
         <h1 className="text-4xl">Community Icons</h1>
-        <section className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:grid-cols-6">
-          <ul>
+        <section>
+          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:grid-cols-6">
             {icons.data?.map((icon: Icon) => {
               return (
                 <li key={icon.id}>
@@ -27,7 +27,7 @@ const CommunityPage: NextPage = () => {
                     height={100}
                     alt={`${icon.prompt}` ?? "Image of an icon"}
                     src={`https://icon-generator-bucket.s3.amazonaws.com/${icon.id}`}
-                    className="w-full rounded"
+                    className="w-full"
                   />
                 </li>
               );
